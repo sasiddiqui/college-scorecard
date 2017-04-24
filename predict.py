@@ -1,39 +1,40 @@
 # Sayeed Siddiqui
+# Run multiple regression models, cross-validate hyperparameters
  
 import pandas as pd
 import numpy as np
+import time
  
-from sklearn import tree
-from sklearn.naive_bayes import GaussianNB
-from sklearn.neural_network import MLPClassifier
-from sklearn import svm
-from sklearn.ensemble import AdaBoostClassifier
-from RuleListClassifier import *
+from sklearn.neural_network import MLPRegressor
+from sklearn.svm import SVR
+from sklearn.linear_model import LinearRegression
  
-#from sklearn import preprocessing
 from sklearn.model_selection import GridSearchCV
-#from sklearn import metrics
- 
-clfs = [(tree.DecisionTreeClassifier(),
-            {'criterion': ['gini', 'entropy'],
-             'max_features': [1,2,3]}),
-        (GaussianNB(),
+
+X = pd.read_csv('data/pca.csv') 
+Y = pd.read_csv('data/Y.csv', header=None).as_matrix().ravel()
+
+preds = [(LinearRegression(),
             {}),
-        (MLPClassifier(),
+        (MLPRegressor(),
             {'activation': ['identity','logistic','tanh','relu'],
              'hidden_layer_sizes': [[10],[7],[4]],
-             'max_iter': [500]}),
-        (svm.SVC(),
-            {'kernel': ['poly'],
-             'degree': [1,2,3]})]
+             'max_iter': [200, 500]}),
+        (SVR(),
+            {'kernel': ['rbf','poly'],
+             'degree': [1,2],
+			 'C': [.5, 1]})]
+
+tpred, tparams = preds[2]
+
+# Try all predictors, combinations of parameters, and different scores 
+def evaluate(pred, params):
  
-myc, myp = clfs[5]
+    for score in ['r2', 'neg_mean_squared_error']:
+        start = time.time()
+        CV = GridSearchCV(pred, params, cv=10, scoring=score)
+        CV.fit(X, Y)
  
-# score is one of: accuracy, precision, recall, roc_auc, f1
-def evaluate(clf, params):
- 
-    for score in ['accuracy', 'roc_auc', 'f1']:
-        CV = GridSearchCV(clf, params, cv=10, scoring=score)
-        CV.fit(X, C)
- 
-        print '%s was %0.2f with params: %s' % (score, CV.best_score_, str(CV.best_params_))
+        print('%s was %0.2f with params: %s in %f s' % (score, CV.best_score_, str(CV.best_params_), time.time()-start))
+
+    return CV

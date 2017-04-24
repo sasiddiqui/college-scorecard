@@ -11,7 +11,7 @@ n = 100
 X = pd.read_csv('data/processed.csv')
 Z = X.as_matrix()
 
-Y = pd.read_csv('Y.csv', header=None)
+Y = pd.read_csv('data/Y.csv', header=None)
 
 cov = np.cov(Z, rowvar=False)
 w, u = la.eigh(cov)
@@ -21,7 +21,7 @@ ind = np.argsort(w)[::-1][:n]
 #u1 = u[:,ind]
 #w1 = w[ind]
 
-#U = np.dot(Z, u)
+U = X.dot(u[:,ind[:35]])
 
 # Evaluate PCA from 1 to 99 components
 x = np.linspace(1,99)
@@ -31,4 +31,6 @@ fig, ax = plt.subplots()
 ax.plot(x,y)
 ax.set_xlabel('PCA components')
 ax.set_ylabel('Variance explained')
-plt.show()
+#plt.show()
+
+U.to_csv('data/pca.csv')
