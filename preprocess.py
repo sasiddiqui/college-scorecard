@@ -38,6 +38,10 @@ for attr in attrs:
 attrs = list(map(rep, groups.values()))
 dat4 = dat3[attrs]
 
+# Normalize data
+dat5 = dat4.fillna(dat4.mean())
+dat5 = (dat5 - dat5.mean())/dat5.std()
+
 # Specify excluded columns
 excluded = ['UNITID', 'OPEID', 'OPEID6', 'SCH_DEG', 'MAIN', 'CONTROL', 'ST_FIPS', 'REGION', 'LOCALE', 'CCBASIC', 'CCUGPROF', 'CCSIZSET', 'RELAFFIL', 'CURROPER', 'POOLYRS']
 
@@ -49,10 +53,11 @@ dep = lambda a: any(map(lambda x: x in a, tokens))
 dependent = [attr for attr in attrs if dep(attr)]
 excluded.extend(dependent)
 
-dat5 = dat4.drop(excluded, axis=1)
+Y = dat5['DEBT_MDN']
+dat6 = dat5.drop(excluded, axis=1)
 
-# Normalize data
-dat6= dat5.fillna(dat5.mean())
-dat6 = (dat6 - dat6.mean())/dat6.std()
+# Compute correlations to debt
+corrs = dat6.corrwith(Y)
 
-dat6.to_csv('processed.csv')
+Y.to_csv('Y.csv', index=False)
+dat6.to_csv('processed.csv', index=False)
