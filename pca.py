@@ -4,10 +4,11 @@
 import pandas as pd
 import numpy as np
 import scipy.linalg as la 
+import matplotlib.pyplot as plt
 
-n = 1
+n = 100 
 
-X = pd.read_csv('processed.csv')
+X = pd.read_csv('data/processed.csv')
 Z = X.as_matrix()
 
 Y = pd.read_csv('Y.csv', header=None)
@@ -17,7 +18,17 @@ w, u = la.eigh(cov)
 
 # Sort values in decreasing order
 ind = np.argsort(w)[::-1][:n]
-u = u[:,ind]
-w = w[ind]
+#u1 = u[:,ind]
+#w1 = w[ind]
 
-U = np.dot(Z, u)
+#U = np.dot(Z, u)
+
+# Evaluate PCA from 1 to 99 components
+x = np.linspace(1,99)
+y = [sum(w[ind[:int(i)]])/sum(w) for i in x]
+
+fig, ax = plt.subplots()
+ax.plot(x,y)
+ax.set_xlabel('PCA components')
+ax.set_ylabel('Variance explained')
+plt.show()

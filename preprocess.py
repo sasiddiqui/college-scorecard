@@ -59,5 +59,5 @@ dat6 = dat5.drop(excluded, axis=1)
 # Compute correlations to debt
 corrs = dat6.corrwith(Y)
 
-Y.to_csv('Y.csv', index=False)
-dat6.to_csv('processed.csv', index=False)
+Y.to_csv('data/Y.csv', index=False)
+dat6.to_csv('data/processed.csv', index=False)
